@@ -2,3 +2,7 @@
 2.一个自解压安装程序 完成
 3.加入文件偷取选择 完成
 4.优化配置文件，启用加密
+
+配置文件设计：
+acceptsuffix=doc,txt,pdf,ppt,xls#,*
+savedir=E:\usb
