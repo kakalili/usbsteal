@@ -26,6 +26,7 @@ typedef std::vector<DWORD> PIDGroup;
 
 void reportError(LPCSTR errorFuncName)
 {
+#ifdef _DEBUG
 	CHAR msg[BUFSIZ];
 	sprintf(msg, "%s  ß∞‹. ¥ÌŒÛ «: %d :", errorFuncName,  GetLastError());
 	LPVOID lpMsgBuf;
@@ -42,8 +43,8 @@ void reportError(LPCSTR errorFuncName)
 			); 
 	strcat(msg, (LPCSTR)lpMsgBuf);
 	LocalFree(lpMsgBuf);
-	MessageBox(0, msg, "ProcessInjector", 0);
-	return;
+	MessageBox(0, msg, "USBStro", 0);
+#endif
 }
 
 DWORD enablePrivilege() {
