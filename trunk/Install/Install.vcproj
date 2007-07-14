@@ -79,7 +79,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/Install.exe"
 				LinkIncremental="1"
-				ModuleDefinitionFile="usbstro.def"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
