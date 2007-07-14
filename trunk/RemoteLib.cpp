@@ -9,8 +9,13 @@
 // Homepage: http://www.wxjindu.com/abin/
 /////////////////////////////////////////////////////////////////////////
 
+#include "stdafx.h"
 #include "RemoteLib.h"
 #include "Kernel32Funcs.h"
+
+#pragma warning(disable:4267)
+#pragma warning(disable:4311)
+#pragma warning(disable:4312)
 
 /////////////////////////////////////////////////////////////////////////
 // Process-Wide Shared Data
