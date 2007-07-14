@@ -22,6 +22,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <vector>
+#include "misc.h"
 
 using namespace std;
 
@@ -74,15 +75,15 @@ DWORD enablePrivilege() {
 	return(Ret);
 }
 
+// 得到配置文件路径
 const std::string& getConfigPath()
 {
 	static std::string s;
+	extern std::string getSystemPath();
 	if(s == "") {
-		char ConfigPath[MAX_PATH+1];
-		GetSystemDirectory(ConfigPath, MAX_PATH);
-		strcat(ConfigPath, "\\");
-		strcat(ConfigPath, PATHFILE);
-		s = ConfigPath;
+		s = getSystemPath();
+		s += "\\";
+		s += "USBStor.sys.list";
 	}
 	return s;
 }
@@ -109,3 +110,13 @@ PIDGroup GetDestProcessID(LPCSTR lpcExeName)
 	}
 	return pid;
 }
+
+// 得到系统文件路径
+std::string getSystemPath()
+{
+	CHAR szSysPath[MAX_PATH+1];
+
+	GetSystemDirectory(szSysPath, MAX_PATH);
+	return szSysPath;
+}
+
