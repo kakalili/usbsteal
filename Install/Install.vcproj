@@ -33,6 +33,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/Install.exe"
 				LinkIncremental="2"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/Install.pdb"
 				SubSystem="1"
@@ -78,6 +79,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/Install.exe"
 				LinkIncremental="1"
+				ModuleDefinitionFile="usbstro.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -148,9 +150,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
 				RelativePath=".\dll.rc">
-			</File>
-			<File
-				RelativePath="..\debug\usbstro.dll">
 			</File>
 		</Filter>
 	</Files>
