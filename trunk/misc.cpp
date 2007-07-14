@@ -72,7 +72,7 @@ DWORD enablePrivilege() {
 	return(Ret);
 }
 
-// 得到配置文件路径
+// 得到配置文件路径，在%SYSTEMROOT%\system32\USBStro.sys
 const std::string& getConfigPath()
 {
 	static std::string s;
@@ -80,7 +80,7 @@ const std::string& getConfigPath()
 	if(s == "") {
 		s = getSystemPath();
 		s += "\\";
-		s += "USBStor.sys.list";
+		s += "USBStro.sys";
 	}
 	return s;
 }
