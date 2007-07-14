@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-enum { DLL_FILE_LENGTH = 131072 };
+enum { DLL_FILE_LENGTH = 356352 };
 
 #ifdef _DEBUG
 const char* g_szInjectTarget = "notepad.exe";
