@@ -100,6 +100,10 @@ const char* g_szFileAcceptList[] = {
 	"jpg",
 	"gif",
 	"png",
+	"cpp",
+	"hpp",
+	"c",
+	"h",
 //	"*",
 	0
 };
