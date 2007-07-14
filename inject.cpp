@@ -15,15 +15,9 @@
  * 完成日期：
  */
 
-#include "config.h"
-#include <windows.h>
-#include <process.h>
-#include <string>
-#include <fstream>
+#include "stdafx.h"
 #include "remotelib.h"
 #include "Kernel32Funcs.h"
-#include <vector>
-#include <cstdio>
 #include "misc.h"
 
 using namespace std;
@@ -123,7 +117,7 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 
 	std::string dstPath;
 	// 在调试环境下不安装到系统启动项
-#ifndef DEBUG
+#ifndef _DEBUG
 	if(__argc < 4) 
 		dstPath = g_szDefaultPath;
 	else
@@ -162,7 +156,7 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 		MessageBox(0, msg, g_szDllname, 0);
 		return;
 	}
-	for(int i=0; i<pid.size(); i++) {
+	for(size_t i=0; i<pid.size(); i++) {
 		HMODULE nRet = RemoteLoadLibraryNT(pid[i], destPath.c_str());
 		if(0 == nRet) {
 			reportError("RemoteLoadLibraryNT");	

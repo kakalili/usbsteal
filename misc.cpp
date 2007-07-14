@@ -15,12 +15,8 @@
 * 完成日期：
 */
 
+#include "stdafx.h"
 #include "config.h"
-#include <windows.h>
-#include <stdio.h>
-#include <string>
-#include <windows.h>
-#include <tlhelp32.h>
 #include <vector>
 #include "misc.h"
 

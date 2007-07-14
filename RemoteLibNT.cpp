@@ -9,8 +9,12 @@
 // Homepage: http://www.wxjindu.com/abin/
 /////////////////////////////////////////////////////////////////////////
 
+#include "stdafx.h"
 #include "RemoteLib.h"
 #include "Kernel32Funcs.h"
+
+#pragma warning(disable:4267)
+#pragma warning(disable:4312)
 
 BOOL IsWindowsNT();
 HANDLE OpenProcessForRemoteExecute(DWORD dwProcessID);

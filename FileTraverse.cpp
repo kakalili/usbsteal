@@ -1,8 +1,4 @@
-#include <windows.h>
-#include <vector>
-#include <string>
-#include <stdlib.h>
-#include <tchar.h>
+#include "stdafx.h"
 
 /** FileTraverse.cpp: 递归得到目录下所有文件名和目录名
  * $Id: FileTraverse.cpp 419 2007-07-04 01:51:33Z outmatch $

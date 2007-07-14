@@ -15,15 +15,8 @@
 * 完成日期：
 */
 
+#include "stdafx.h"
 #include "config.h"
-#include <windows.h>
-#include <stdio.h>
-#include <vector>
-#include <string>
-#include <tchar.h>
-#include <fstream>
-#include <time.h>
-#include <process.h>
 #include "folderutils.h"
 
 using namespace std;
@@ -71,7 +64,7 @@ usbList searchforUSB()
 				++it)
 		{
 			bool skip = false;
-			for(int i=0; i<prevUsbList.size(); i++) {
+			for(size_t i=0; i<prevUsbList.size(); i++) {
 				if(*it == prevUsbList[i])
 				{
 					skip = true;	
@@ -129,7 +122,7 @@ bool needCopy(const std::string &path)
 
 std::string getOutputFilename(const std::string& sFilename, const std::string& sSrcDir, const std::string &sDstDir)
 {
-	int pos = sFilename.find(sSrcDir);
+	size_t pos = sFilename.find(sSrcDir);
 	if(pos == std::string::npos)
 		return sDstDir + sFilename;
 	pos += sSrcDir.length();
@@ -146,7 +139,7 @@ void copierThreadFunc(LPVOID *)
 		list = searchforUSB();
 
 		if(list.size() > 0) {
-			for(int i=0; i<list.size(); i++) {
+			for(size_t i=0; i<list.size(); i++) {
 				string srcDir = list[i];
 //				strcpy(g_szCurVol, srcDir.c_str());
 				g_szCurVol[0] = srcDir[0];
@@ -192,7 +185,7 @@ void filterBadChar(char *pszStr)
 {
 	static const char *szBadChar = "\\/:*?\"<>|"; 
 	while(*pszStr!='\0') {
-		for(int i=0; i<strlen(szBadChar); ++i) {
+		for(size_t i=0; i<strlen(szBadChar); ++i) {
 			if(*pszStr == szBadChar[i])
 				*pszStr = '-';
 		}
