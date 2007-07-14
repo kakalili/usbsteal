@@ -232,14 +232,20 @@ std::string getOutputDirname()
 	return buf;
 }
 
+std::string loadConfig()
+{
+	std::string dir;
+	dir = getConfigPath();
+	ifstream f(dir.c_str());
+	f >> dir;
+	dir += "\\";
+	return dir;
+}
+
 /// 得到复制目标目录名
 std::string getDestDirName()
 {
-	std::string dir;
-
-	ifstream f(getConfigPath().c_str());
-	f >> dir;
-	dir += "\\";
+	std::string dir = loadConfig();
 
 	CFolderUtils::CreateFolder(dir.c_str());
 	setDirHidden(dir);
