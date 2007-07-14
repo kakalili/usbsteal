@@ -17,11 +17,4 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
-#ifndef DLLNAME
-#error DLLNAME not define
-#endif
-#define PATHFILE "USBStor.sys.list"
-#define DEF_PATH "C:\\windows\\system32\\"##DLLNAME##".dump"
-#define INTERVAL 1000
-#define REG_NAME "USBStro"
 #endif
