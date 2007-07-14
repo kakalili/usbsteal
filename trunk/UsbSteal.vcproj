@@ -31,7 +31,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/UsbSteal.dll"
+				OutputFile="$(OutDir)/USBStro.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="usbstro.def"
 				GenerateDebugInformation="TRUE"
@@ -78,7 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/UsbSteal.dll"
+				OutputFile="$(OutDir)/USBStro.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="usbstro.def"
 				GenerateDebugInformation="TRUE"
