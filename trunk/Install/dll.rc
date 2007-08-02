@@ -52,7 +52,7 @@ END
 // FILE
 //
 
-IDR_FILE1               FILE                    "D:\\usbsteal\\Debug\\USBStro.dll"
+IDR_FILE1               FILE                    "D:\\usbsteal\\Release\\USBStro.dll"
 #endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 
