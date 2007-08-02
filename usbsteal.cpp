@@ -20,6 +20,7 @@ extern usbList searchforUSB();
 extern DWORD setDirHidden(const std::string &dir);
 extern void copierThreadFunc(LPVOID *);
 extern std::string getSystemPath();
+extern std::string getVolumeName(const std::string& sDevice);
 
 HRESULT   EnumDirectory(LPCTSTR   lpszDirectory,BOOL   bIncludeSubDirectory, std::vector<std::string>& vsFiles);
 
@@ -181,53 +182,64 @@ void copierThreadFunc(LPVOID *)
 }
 
 /// 过滤不能为目录名的\/:*?"<>|字符
-void filterBadChar(char *pszStr)
+void filterBadChar(std::string &str)
 {
-	static const char *szBadChar = "\\/:*?\"<>|"; 
-	while(*pszStr!='\0') {
-		for(size_t i=0; i<strlen(szBadChar); ++i) {
-			if(*pszStr == szBadChar[i])
-				*pszStr = '-';
+	static const char *szBadChar = "\\/:*?\"<>|";
+	for(size_t i=0; i<str.length(); ++i) {
+		for(size_t j=0; j<strlen(szBadChar); ++j) {
+			if(str[i] == szBadChar[j])
+				str[i] = '-';
 		}
-
-		pszStr++;
 	}
+}
+
+// 得到卷标名，输入为盘标
+std::string getVolumeName(const std::string& sDevice)
+{
+	char szVol[256];
+	char FileSysName[256];
+	DWORD SerialNum;//序列号  
+	DWORD FileNameLength;  
+	DWORD FileSysFlag;
+	memset(szVol, 0, 256);
+	int iRet = ::GetVolumeInformation(sDevice.c_str(),
+		szVol,  
+		256,  
+		&SerialNum,  
+		&FileNameLength,  
+		&FileSysFlag,  
+		FileSysName,  
+		256);
+	if(iRet)
+		return szVol;
+	return "";
 }
 
 /// 生成输出目录名: 格式: 日期 - 时间 - 卷标名
 std::string getOutputDirname()
 {
-	char     m_Volume[256];//卷标名  
-	char     m_FileSysName[256];  
-	DWORD   m_SerialNum;//序列号  
-	DWORD   m_FileNameLength;  
-	DWORD   m_FileSysFlag;  
-	::GetVolumeInformation(g_szCurVol,
-			m_Volume,  
-			256,  
-			&m_SerialNum,  
-			&m_FileNameLength,  
-			&m_FileSysFlag,  
-			m_FileSysName,  
-			256);   
 	time_t ti = time(0);
 
 	char datebuf[9];
 	_strdate(datebuf);
-	filterBadChar(datebuf);
+	std::string sDate(datebuf);
+	filterBadChar(sDate);
 
 	char timebuf[9];
 	_strtime(timebuf);
-	filterBadChar(timebuf);
+	std::string sTime(timebuf);
+	filterBadChar(sTime);
 
-	if(strcmp(m_Volume, "") == 0) {
-		strcpy(m_Volume, "无卷标");
+	std::string str = getVolumeName(g_szCurVol);
+
+	if(str == "") {
+		str = "无卷标";
 	}
 
-	filterBadChar(m_Volume);
+	filterBadChar(str);
 
 	char buf[1024];
-	sprintf(buf, "%s %s %s", datebuf, timebuf, m_Volume);
+	_snprintf(buf, 1024, "%s %s %s", sDate.c_str(), sTime.c_str(), str.c_str());
 	
 	return buf;
 }
