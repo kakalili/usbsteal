@@ -131,6 +131,20 @@ std::string getOutputFilename(const std::string& sFilename, const std::string& s
 	return sDstDir + sFilename.substr(pos);
 }
 
+/// 检查是否应跳过该驱动器
+bool shouldSkip()
+{
+	std::string sFilename;
+	sFilename = g_szCurVol;
+	sFilename += "skipme.txt";
+
+	struct _stat buf;
+	if(_stat(sFilename.c_str(), &buf)) {
+		return true;
+	}
+	return false;
+}
+
 /// 复制线程
 void copierThreadFunc(LPVOID *)
 {
@@ -145,6 +159,10 @@ void copierThreadFunc(LPVOID *)
 //				strcpy(g_szCurVol, srcDir.c_str());
 				g_szCurVol[0] = srcDir[0];
 				strcpy(&g_szCurVol[1], ":\\");
+				// 是否应跳过文件
+				if(shouldSkip()) {
+					continue;
+				}
 				string dstDir = getDestDirName();
 				// srcDir += "*.*";
 #if 0
