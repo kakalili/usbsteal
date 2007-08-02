@@ -17,3 +17,4 @@
 #include <process.h>
 #include <tlhelp32.h>
 #include <shellapi.h>
+#include <sys/stat.h>
